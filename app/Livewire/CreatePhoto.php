@@ -11,27 +11,22 @@ use Livewire\Component;
 use Illuminate\Contracts\View\View;
 use RalphJSmit\Filament\MediaLibrary\Forms\Components\MediaPicker;
 
-
-class EditPhoto extends Component implements HasForms
+class CreatePhoto extends Component implements HasForms
 {
     use InteractsWithForms;
 
     public ?array $data = [];
 
-    public Photo $record;
-
     public function mount(): void
     {
-        $this->record = Photo::get();
-
-        $this->form->fill($this->record->attributesToArray());
+        $this->form->fill();
     }
 
     public function form(Form $form): Form
     {
         return $form
             ->schema([
-                MediaPicker::make('photos')
+                MediaPicker::make('photo')
                 ->nativeActionModal()
                 ->label('Choose images')
                 ->multiple()
@@ -39,18 +34,20 @@ class EditPhoto extends Component implements HasForms
                 ->showFileName(),
             ])
             ->statePath('data')
-            ->model($this->record);
+            ->model(Photo::class);
     }
 
-    public function save(): void
+    public function create(): void
     {
         $data = $this->form->getState();
 
-        $this->record->update($data);
+        $record = Photo::create($data);
+
+        $this->form->model($record)->saveRelationships();
     }
 
     public function render(): View
     {
-        return view('livewire.edit-photo');
+        return view('livewire.create-photo');
     }
 }
